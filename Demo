@@ -1,0 +1,200 @@
+import sys
+import random
+from PyQt6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QTabWidget,
+    QVBoxLayout,
+    QPushButton,
+    QMessageBox,
+    QComboBox,
+    QDial,
+    QSlider,
+    QLabel,
+    QLineEdit,
+)
+from PyQt6.QtCore import Qt
+
+
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("PyQT Demo")
+        self.resize(900, 600)
+
+        central = QWidget(self)
+        central.setObjectName("central_widget")
+        self.setCentralWidget(central)
+
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
+
+        self.tabs = QTabWidget()
+        self.tabs.setObjectName("main_tabs")
+        self.tabs.setTabPosition(QTabWidget.TabPosition.North)
+        layout.addWidget(self.tabs)
+
+        self.add_PopUp_tab()
+        self.add_DropDown_tab()
+        self.add_SliderDial_tab()
+        self.add_Exit_tab()
+
+        # Styling in QT Style format (like CSS)
+        self.setStyleSheet(
+            """
+            QWidget#central_widget {
+                background-color: #CC5500;
+            }
+            QWidget#tab_content {
+                background-color: transparent;
+            }
+            QTabWidget::pane { border: 0; background: transparent; }
+            QTabBar::tab {
+                background: rgba(255,255,255,0.12);
+                color: white;
+                padding: 8px 14px;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                margin-right: 4px;
+                min-width: 80px;
+            }
+            QTabBar::tab:selected {
+                background: rgba(255,255,255,0.20);
+                font-weight: 600;
+            }
+            QPushButton {
+                background-color: rgba(255,255,255,0.2);
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255,255,255,0.3);
+            }
+            QComboBox {
+                background-color: #FFCC99;   
+                border-radius: 6px;
+                padding: 6px 10px;
+                color: black;                
+                font-size: 14px;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #FFE0B3;     
+                selection-background-color: #FFD580;
+                color: black;                 
+                selection-color: black;  
+            }
+    
+            """
+        )
+
+    def affirmative(self):
+        affirmative_words = [
+                "Yes",
+                "Yeah",
+                "Yup",
+                "Yep",
+                "Sure",
+                "Of course",
+                "Absolutely",
+                "Definitely",
+                "Certainly",
+                "Indeed",
+                "Affirmative",
+                "Aye",
+                "Naturally",
+                "Surely"
+                ]
+        return random.choice(affirmative_words)
+
+    def add_PopUp_tab(self):
+        tab = QWidget()
+        tab.setObjectName("tab_content")
+        layout = QVBoxLayout(tab)
+
+        label1 = QLabel("Decision Maker")
+        label1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(label1)
+        label1.setStyleSheet("font-size: 50px; color: white;")
+
+
+        label = QLabel("Should you skip that 8am class?")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(label)
+        label.setStyleSheet("font-size: 32px; color: white;")
+
+        btn = QPushButton("Click Here")
+        btn.clicked.connect(self.show_popup)
+        layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.tabs.addTab(tab, "Pop Up Test")
+
+    def show_popup(self):
+        QMessageBox.information(self, "Message", self.affirmative())
+
+    def add_DropDown_tab(self):
+        tab = QWidget()
+        tab.setObjectName("tab_content")
+        layout = QVBoxLayout(tab)
+
+        combo = QComboBox()
+        combo.addItems(["I", "Am", "Groot"])
+        layout.addWidget(combo, alignment=Qt.AlignmentFlag.AlignCenter)
+        combo.setMinimumSize(200, 40)
+
+        self.tabs.addTab(tab, "Drop Down Test")
+
+    def add_SliderDial_tab(self):
+        tab = QWidget()
+        tab.setObjectName("tab_content")
+        layout = QVBoxLayout(tab)
+
+        dial = QDial()
+        dial.setRange(0, 100)
+
+        slider = QSlider(Qt.Orientation.Horizontal)
+        slider.setRange(0, 100)
+
+        value_display = QLineEdit()
+        value_display.setReadOnly(True)
+        value_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        value_display.setFixedWidth(80)
+        value_display.setText("0")
+
+        dial.valueChanged.connect(slider.setValue)
+        slider.valueChanged.connect(dial.setValue)
+        dial.valueChanged.connect(lambda v: value_display.setText(str(v)))
+
+        layout.addWidget(dial, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(slider)
+        layout.addWidget(value_display, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.tabs.addTab(tab, "Slider and Dial Test")
+
+    def add_Exit_tab(self):
+        tab = QWidget()
+        tab.setObjectName("tab_content")
+        layout = QVBoxLayout(tab)
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(QApplication.instance().quit)
+        layout.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.tabs.addTab(tab, "Exit")
+
+
+def main():
+    app = QApplication(sys.argv)
+    w = MainWindow()
+    w.show()
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
